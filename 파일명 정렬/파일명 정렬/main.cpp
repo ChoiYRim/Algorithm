@@ -6,7 +6,6 @@
 
 #define IS_ALPHA(x) (('A' <= x && x <= 'Z') || ('a' <= x && x <= 'z') || x == '-' || x == ' ' || x == '.')
 #define IS_NUMBER(x) ('0' <= x && x <= '9')
-#define IS_SPECIAL(x) (x == ' ' || x == '.' || x == '-')
 
 using namespace std;
 
@@ -65,8 +64,8 @@ bool compareByRules(const string& fn1,const string& fn2)
     
     if(c1 == c2)
     {
-        cout << ret1.number << " ";
-        cout << ret2.number << endl;;
+        //cout << ret1.number << " ";
+        //cout << ret2.number << endl;;
         n1 = stoi(ret1.number);
         n2 = stoi(ret2.number);
         
