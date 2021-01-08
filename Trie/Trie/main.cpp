@@ -4,6 +4,7 @@
     Version : 1.0 ( insert() , treePrint() 테스트 완료 )
 */
 
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -11,10 +12,10 @@
 typedef struct _alphaTrieNode
 {
 private:
-    char ch;
-    int depth;
-    int numChild;
-    bool isRoot;
+    char ch; // 저장할 문자
+    int depth; // 트리 깊이
+    int numChild; // 자식 개수
+    bool isRoot; // 현재 노드가 루트인가?
     int last; // 마지막 자식의 인덱스
     bool isLast; // 현재 노드가 현재 노드의 부모의 마지막 자식인가?
     
@@ -48,13 +49,6 @@ public:
     }
     ~_alphaTrieNode()
     {
-        for(int i = 0; i < 26; i++)
-        {
-            if(this->child[i] != NULL)
-            {
-                delete this->child[i]; // delete -> 소멸자 호출 즉, 자식의 자식들까지 모두 정리 (?)
-            }
-        }
     }
     struct _alphaTrieNode** getChildren(void)
     {
@@ -63,6 +57,10 @@ public:
     bool isNodeLast(void)
     {
         return this->isLast;
+    }
+    bool isNodeRoot(void)
+    {
+        return this->isRoot;
     }
     void connectWithParent(struct _alphaTrieNode* node)
     {
@@ -134,10 +132,6 @@ public:
     {
         return this->parent;
     }
-    char getCharacter(void)
-    {
-        return this->ch;
-    }
     int getDepth(void)
     {
         return this->depth;
@@ -152,48 +146,17 @@ public:
     {
         return this->numChild;
     }
+    void setLastIndex(int idx)
+    {
+        this->last = idx;
+    }
+    int getLastIndex(void)
+    {
+        return this->last;
+    }
     char getCh(void)
     {
         return this->ch;
-    }
-    void erase(std::string str)
-    {
-        char c;
-        int order;
-        
-        if(str.length() <= 0)
-            return;
-        
-        c = std::tolower(str[0]);
-        order = c-'a';
-        
-        if(this->child[order] && str.length() > 1)
-        {
-            std::string newStr = str.substr(1,str.length());
-            if(newStr.length() == 1 && this->child[order]->numberOfChildren() == 0)
-            {
-                if(this->last == order)
-                {
-                    bool check = false;
-                    for(int i = 0; i < last; i++)
-                    {
-                        if(this->child[i] != NULL)
-                        {
-                            check = true;
-                            this->last = i;
-                            break;
-                        }
-                    }
-                    if(!check)
-                        this->last = -1;
-                }
-                this->numChild--;
-                delete this->child[order];
-                return;
-            }
-            this->child[order]->erase(newStr);
-        }
-        return;
     }
     std::string makeTabs(struct _alphaTrieNode* root,struct _alphaTrieNode* start)
     {
@@ -278,6 +241,9 @@ public:
         print(root,root); // root부터 출력 시작
         return;
     }
+    void erase(std::string str)
+    {
+    }
 }ATri;
 
 int main(int argc, const char * argv[])
@@ -300,6 +266,6 @@ int main(int argc, const char * argv[])
         root->insert(strs[i]);
     
     root->treePrint(root);
-    
+
     return 0;
 }
