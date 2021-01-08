@@ -1,66 +1,95 @@
-#include <iostream>
-#include <algorithm>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
 int N,L;
 
-bool comp(const string& s1,const string& s2)
+struct Trie
 {
-    if(s1 < s2)
-        return true;
-    return false;
-}
+    Trie *child[26];
+    int depth;
+    int numString;
+    char ch;
+    bool isRoot;
+    bool isLast;
+    
+    Trie(char ch,int depth,bool isRoot) // Constructor
+    {
+        this->numString = 0;
+        this->depth = depth;
+        this->ch = ch;
+        this->isRoot = isRoot;
+        this->isLast = false;
+        
+        for(int i = 0; i < 26; i++)
+        {
+            this->child[i] = NULL;
+        }
+    }
+    
+    void insert(string str)
+    {
+        this->numString++;
+        
+        if(str.length() <= 0)
+            return;
+        
+        char c = str[0];
+        int idx = c-'a';
+        
+        if(this->child[idx])
+        {
+            string newStr = str.substr(1,str.length());
+            this->child[idx]->insert(newStr);
+        }
+        else
+        {
+            this->child[idx] = new Trie(c,this->depth+1,false);
+            
+            string newStr = str.substr(1,str.length());
+            if(newStr.length() > 0)
+                this->child[idx]->insert(newStr);
+            else
+                this->child[idx]->isLast = true;
+        }
+    }
+    
+    int find(string str,int count)
+    {
+        if(str.length() <= 0 || (this->numString == 1 && !(this->isLast) && str.length() > 0))
+            return count;
+        
+        char c = str[0];
+        int idx = c-'a';
+        string newStr = str.substr(1,str.length());
+        
+        if(this->child[idx])
+            return this->child[idx]->find(newStr,count+1);
+        return 0;
+    }
+};
 
 int solution(vector<string> words)
 {
     int answer = 0;
-    int idx = 0,len = (int)words.size();
+    Trie *root = new Trie(' ',0,true);
     
-    while(idx < len)
+    for(string word : words)
+        root->insert(word);
+    
+    for(string word : words)
     {
-        string sub = "";
-        string word = words[idx];
-        
-        for(int i = 0; i < word.length(); i++)
-        {
-            vector<string> search;
-            sub += word[i];
-            
-            for(string& str : words)
-            {
-                if(str != word && str.find(sub) != string::npos)
-                    search.push_back(str);
-                if(search.size() > 1 && sub.length() != word.length()) // 최소가 아닌 경우
-                    break;
-            }
-            
-            // 두 가지 경우 존재
-            // 1. word와 word 전체를 부분 문자열로 갖는 다른 문자열
-            // 2. word의 부분 문자열을 갖는 다른 문자열이 없는 경우
-            if(search.size() <= 0)
-            {
-                answer += sub.length();
-                break;
-            }
-            else // search.size() > 0
-            {
-                if(sub.length() == word.length())
-                {
-                    answer += word.length();
-                    break;
-                }
-            }
-        }
-        idx++;
+        answer += root->find(word,0);
+        //cout << "Answer : " << answer << endl;
     }
     
     return answer;
 }
 
-int main(int argc, const char * argv[])
+int main(int argc,const char *argv[])
 {
     vector<string> words;
     
@@ -71,10 +100,9 @@ int main(int argc, const char * argv[])
     cin >> N >> L;
     for(int i = 0; i < N; i++)
     {
-        string temp;
-        
-        cin >> temp;
-        words.push_back(temp);
+        string word;
+        cin >> word;
+        words.push_back(word);
     }
     
     cout << solution(words) << '\n';
