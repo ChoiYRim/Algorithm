@@ -1,7 +1,9 @@
+// [Reference] : https://yabmoons.tistory.com/490
+// 시간 초과 문제로 타인 코드 참조
+
 #include <string>
 #include <vector>
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
@@ -10,80 +12,71 @@ int N,L;
 struct Trie
 {
     Trie *child[26];
-    int depth;
     int numString;
-    char ch;
-    bool isRoot;
     bool isLast;
     
-    Trie(char ch,int depth,bool isRoot) // Constructor
-    {
-        this->numString = 0;
-        this->depth = depth;
-        this->ch = ch;
-        this->isRoot = isRoot;
-        this->isLast = false;
-        
-        for(int i = 0; i < 26; i++)
-        {
-            this->child[i] = NULL;
-        }
-    }
-    
-    void insert(string str)
-    {
-        this->numString++;
-        
-        if(str.length() <= 0)
-            return;
-        
-        char c = str[0];
-        int idx = c-'a';
-        
-        if(this->child[idx])
-        {
-            string newStr = str.substr(1,str.length());
-            this->child[idx]->insert(newStr);
-        }
-        else
-        {
-            this->child[idx] = new Trie(c,this->depth+1,false);
-            
-            string newStr = str.substr(1,str.length());
-            if(newStr.length() > 0)
-                this->child[idx]->insert(newStr);
-            else
-                this->child[idx]->isLast = true;
-        }
-    }
-    
-    int find(string str,int count)
-    {
-        if(str.length() <= 0 || (this->numString == 1 && !(this->isLast) && str.length() > 0))
-            return count;
-        
-        char c = str[0];
-        int idx = c-'a';
-        string newStr = str.substr(1,str.length());
-        
-        if(this->child[idx])
-            return this->child[idx]->find(newStr,count+1);
-        return 0;
-    }
+    void insert(const char *str);
+    int find(const char *str,int count);
 };
+
+int numTrie = 0;
+Trie nodes[1000001];
+
+Trie *createTrie()
+{
+    Trie *newNode = &nodes[numTrie++];
+    
+    newNode->numString = 0;
+    newNode->isLast = false;
+    
+    for(int i = 0; i < 26; i++)
+        newNode->child[i] = NULL;
+    
+    return newNode;
+}
+
+void Trie::insert(const char *str)
+{
+    numString++;
+    
+    if(*str == 0)
+    {
+        isLast = true;
+        return;
+    }
+    
+    int idx = str[0]-'a';
+    
+    if(child[idx] == NULL)
+        child[idx] = createTrie();
+    child[idx]->insert(str+1);
+}
+
+int Trie::find(const char *str,int count)
+{
+    if(*str == 0 || numString == 1)
+        return count;
+    
+    int idx = str[0]-'a';
+    
+    if(child[idx])
+        return child[idx]->find(str+1,count+1);
+    return 0;
+}
 
 int solution(vector<string> words)
 {
     int answer = 0;
-    Trie *root = new Trie(' ',0,true);
-    
-    for(string word : words)
-        root->insert(word);
+    Trie *root = createTrie();
     
     for(string word : words)
     {
-        answer += root->find(word,0);
-        //cout << "Answer : " << answer << endl;
+        root->insert(word.c_str());
+    }
+    
+    for(string word : words)
+    {
+        answer += root->find(word.c_str(),0);
     }
     
     return answer;
