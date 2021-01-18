@@ -7,15 +7,31 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "8A8371D1-FC69-44F5-9256-7F344FBED974"
+            uuid = "EC7581FE-16FE-41C8-9801-6D4B1F4425E1"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "&#x1106;&#x116e;&#x110c;&#x1175;&#x110b;&#x1174; &#x1106;&#x1165;&#x11a8;&#x1107;&#x1161;&#x11bc; &#x1105;&#x1161;&#x110b;&#x1175;&#x1107;&#x1173;/main.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
+            landmarkName = "solution(food_times, k)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E0FA75DF-5F73-4FB7-9A3F-98F4770F30BE"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "&#x1106;&#x116e;&#x110c;&#x1175;&#x110b;&#x1174; &#x1106;&#x1165;&#x11a8;&#x1107;&#x1161;&#x11bc; &#x1105;&#x1161;&#x110b;&#x1175;&#x1107;&#x1173;/main.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
             landmarkName = "solution(food_times, k)"
             landmarkType = "9">
          </BreakpointContent>
