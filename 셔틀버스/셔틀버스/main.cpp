@@ -1,7 +1,6 @@
-// 수정중
-
-#include <string>
+#include <queue>
 #include <vector>
+#include <string>
 #include <iostream>
 #include <algorithm>
 
@@ -9,147 +8,121 @@ using namespace std;
 
 bool comp(const string &s1,const string &s2)
 {
-    int hour1,hour2,minute1,minute2;
-    string h1,h2,m1,m2;
-    h1 = h2 = m1 = m2 = "";
+    string h1 = "",h2 = "";
+    string m1 = "",m2 = "";
+    int hour1,hour2,min1,min2;
     
     h1 += s1[0]; h1 += s1[1];
     m1 += s1[3]; m1 += s1[4];
     hour1 = stoi(h1);
-    minute1 = stoi(m1);
+    min1 = stoi(m1);
     
     h2 += s2[0]; h2 += s2[1];
     m2 += s2[3]; m2 += s2[4];
     hour2 = stoi(h2);
-    minute2 = stoi(m2);
+    min2 = stoi(m2);
     
     if(hour1 == hour2)
-        return minute1 < minute2;
+        return min1 < min2;
     return hour1 < hour2;
 }
 
 string solution(int n,int t,int m,vector<string> timetable)
 {
     string answer = "";
-    string sh = "09",sm = "00"; // standard hour , standard minute
-    int cnt = 0;
-    vector<string> result;
+    int hour = 9,minute = 0,idx; // 기준시
+    queue<string> q;
+    vector<string> v[10];
     
     sort(timetable.begin(),timetable.end(),comp);
-    
     for(int i = 0; i < (int)timetable.size(); i++)
+        q.push(timetable[i]);
+    
+    for(int shuttle = 0; shuttle < n; shuttle++)
     {
-        int j,shi = stoi(sh);
-        int smi = stoi(sm);
-        cnt = 0;
-        result.clear();
+        idx = 0;
         
-        for(j = i; j < (int)timetable.size(); j++)
+        while(!q.empty() && idx < m)
         {
-            int hi,mi;
-            string h = "",minute = "";
+            string time = q.front();
+            string tempH = "",tempM = "";
+            int curH,curM;
             
-            h += timetable[j][0];
-            h += timetable[j][1];
-            minute += timetable[j][3];
-            minute += timetable[j][4];
+            tempH += time[0]; tempH += time[1];
+            tempM += time[3]; tempM += time[4];
+            curH = stoi(tempH);
+            curM = stoi(tempM);
             
-            hi = stoi(h); mi = stoi(minute);
-            if(cnt < m)
+            if(hour < curH)
+                break;
+            else
             {
-                if(hi < shi)
+                if(hour == curH)
                 {
-                    cnt++;
-                    result.push_back(timetable[j]);
-                }
-                else if(hi == shi)
-                {
-                    if(mi <= smi)
+                    if(minute >= curM)
                     {
-                        cnt++;
-                        result.push_back(timetable[j]);
+                        idx++;
+                        v[shuttle].push_back(time);
+                        q.pop();
                     }
                     else
-                    {
-                        i = j-1;
                         break;
-                    }
                 }
                 else
                 {
-                    i = j-1;
-                    break;
+                    idx++;
+                    v[shuttle].push_back(time);
+                    q.pop();
                 }
             }
-            else
-            {
-                i = j-1;
-                break;
-            }
         }
-        if(j >= (int)timetable.size())
+        minute += t;
+        if(minute >= 60)
         {
-            break;
+            minute -= 60;
+            hour++;
+            if(hour >= 24)
+                hour -= 24;
         }
-                   
-        smi += t;
-        if(smi >= 60)
+    }
+    if(v[n-1].size() < m) // m명의 승객이 꽉 차지않은 상태로 끝났음
+    {
+        minute-=t;
+        if(minute < 0)
         {
-            if(shi == 23)
-            {
-                shi = 0;
-                sh = "00";
-            }
-            else
-            {
-                shi++;
-                sh = to_string(shi);
-            }
-            smi -= 60;
+            minute += 60;
+            hour--;
+            if(hour < 0)
+                hour += 24;
         }
-        else
+    }
+    else // m명의 승객이 꽉 찼다 -> 최종시간 - 1
+    {
+        string time = v[n-1][m-1];
+        string tempH = "",tempM = "";
+        
+        tempH += time[0]; tempH += time[1];
+        tempM += time[3]; tempM += time[4];
+        hour = stoi(tempH);
+        minute = stoi(tempM);
+        
+        minute--;
+        if(minute < 0)
         {
-            sh = to_string(shi);
-            sm = to_string(smi);
+            minute += 60;
+            hour--;
+            if(hour < 0)
+                hour += 24;
         }
     }
     
-    if(cnt >= m)
-    {
-        if((int)result.size() > 0)
-        {
-            int last = (int)result.size()-1;
-            sh = ""; sm = "";
-            sh += result[last][0]; sh += result[last][1];
-            sm += result[last][3]; sm += result[last][4];
-            
-            int shi = stoi(sh);
-            int smi = stoi(sm);
-            
-            smi--;
-            sm = ""; sh = "";
-
-            if(smi < 0)
-            {
-                smi = 59;
-                if(shi == 0)
-                    shi = 23;
-            }
-            if(smi < 10)
-            {
-                sm += "0";
-                if(shi < 10)
-                {
-                    sh += "0";
-                }
-            }
-            sm += to_string(smi);
-            sh += to_string(shi);
-        }
-    }
-    answer += sh;
+    if(hour < 10)
+        answer += "0";
+    answer += to_string(hour);
     answer += ":";
-    answer += sm;
+    if(minute < 10)
+        answer += "0";
+    answer += to_string(minute);
     
     return answer;
 }
@@ -160,8 +133,8 @@ int main(int argc, const char * argv[])
     cin.tie(0);
     cout.tie(0);
     
-    int n = 2,t = 10,m = 2;
-    vector<string> timetable = {"09:10", "09:09", "08:00"};
+    int n = 10,t = 60,m = 45;
+    vector<string> timetable = {"23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59"};
     
     cout << solution(n,t,m,timetable) << '\n';
     return 0;
